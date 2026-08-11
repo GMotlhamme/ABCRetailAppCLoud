@@ -5,10 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.Configure<AzureBlobStorageConfigs>(
-    builder.Configuration.GetSection("AzureStorage"));
+
 builder.Services.AddScoped<AzureTableService>();
+builder.Services.Configure<AzureBlobStorageConfigs>(builder.Configuration.GetSection("AzureStorage"));
 builder.Services.AddScoped<AzureBlobService>();
+builder.Services.AddScoped<AzureQueueService>();
+//builder.Services.AddScoped<AzurefileService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,7 +30,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Customer}/{action=Index}/{id?}")
+    pattern: "{controller=Order}/{action=Create}/{id?}")
     .WithStaticAssets();
 
 
