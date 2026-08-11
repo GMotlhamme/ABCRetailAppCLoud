@@ -1,0 +1,21 @@
+﻿@model ABCRetailAppCLoud.Models.Customer
+
+<h2>Create Borrower</h2>
+
+<form asp-action="Create" method="post">
+
+    <label asp-for="FullName"></label>
+    <input asp-for="FullName" />
+
+    <label asp-for="Email"></label>
+    <input asp-for="Email" />
+
+    <label asp-for="Address"></label>
+    <input asp-for="Address" />
+
+    <label asp-for="City"></label>
+    <input asp-for="City" />
+
+    <button type="submit">Create</button>
+
+</form>

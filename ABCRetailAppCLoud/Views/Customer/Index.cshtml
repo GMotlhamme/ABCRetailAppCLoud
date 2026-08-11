@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Customer>
+
+<h1>List of Customers!!</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>FullName</th>
+
+            <th>Email</th>
+
+            <th>Address</th>
+
+            <th>City</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+
+            <tr>
+                <td>@customer.FullName</td>
+                <td>@customer.Email</td>
+                <td>@customer.Address</td>
+                <td>@customer.City</td>
+                <td>
+                    <a href="@Url.Action("Edit", new
+                       {
+                           partitionKey = customer.PartitionKey,
+                           rowKey = customer.RowKey
+                       })" class=" btn btn-dark">Edit</a>
+                </td>
+                <td>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="partitionKey" value="@customer.PartitionKey" />
+                        <input type="hidden" name="rowKey" value="@customer.RowKey" />
+
+                        <button type="submit" class="btn btn-dark">
+                            Delete
+                        </button>
+                    </form>
+                    
+                </td>
+                <td>
+                    <a href="@Url.Action("Details", new
+                       {
+                           partitionKey = customer.PartitionKey,
+                           rowKey = customer.RowKey
+                       })" class="btn btn-dark">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create")">Lets Create!!</a>

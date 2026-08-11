@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Product>
+
+<h1>List of Products!!</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Product Name</th>
+
+            <th>Description</th>
+
+            <th>Price</th>
+
+            <th>Image</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+
+            <tr>
+                <td>@product.ProductName</td>
+                <td>@product.Description<td>
+                <td>@product.Price</td>
+                <td>
+                            <img src="@product.ProductImage" alt="@product.ProductName"
+                                 style="max-width: 400px;" />
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", new
+                       {
+                           partitionKey = product.PartitionKey,
+                           rowKey = product.RowKey
+                       })" class=" btn btn-dark">Edit</a>
+                </td>
+                <td>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="partitionKey" value="@product.PartitionKey" />
+                                <input type="hidden" name="rowKey" value="@product.RowKey" />
+
+                        <button type="submit" class="btn btn-dark">
+                            Delete
+                        </button>
+                    </form>
+
+                </td>
+                <td>
+                    <a href="@Url.Action("Details", new
+                       {
+                                   partitionKey = product.PartitionKey,
+                                   rowKey = product.RowKey
+                       })" class="btn btn-dark">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create")">Lets Create!!</a>

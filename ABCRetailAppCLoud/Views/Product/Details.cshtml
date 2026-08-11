@@ -1,0 +1,33 @@
+﻿@model Product
+
+<h2>Product Details</h2>
+
+<div>
+    <h4>@Model.ProductName</h4>
+
+    <p>
+        <strong>Description:</strong>
+        @Model.Description
+    </p>
+
+    <p>
+        <strong>Price:</strong>
+        @Model.Price
+    </p>
+
+    <p>
+        <img src="@Model.ProductImage" alt="@Model.ProductName"
+             style="max-width: 400px;" />
+        
+    </p>
+</div>
+
+<a asp-action="Edit"
+   asp-route-partitionKey="@Model.PartitionKey"
+   asp-route-rowKey="@Model.RowKey">
+    Edit
+</a>
+
+<a asp-action="Index">
+    Back to Products
+</a>

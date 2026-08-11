@@ -1,0 +1,32 @@
+﻿@model ABCRetailAppCLoud.Models.Product
+
+<h2>Create Product</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <div>
+        <label asp-for="ProductName"></label>
+        <input asp-for="ProductName" />
+        <span asp-validation-for="ProductName"></span>
+    </div>
+
+    <div>
+        <label asp-for="Description"></label>
+        <input asp-for="Description" />
+        <span asp-validation-for="Description"></span>
+    </div>
+
+    <div>
+        <label asp-for="Price"></label>
+        <input asp-for="Price" />
+        <span asp-validation-for="Price"></span>
+    </div>
+
+    <div>
+        <label>Product Image</label>
+        <input type="file" name="file" accept="image/*" />
+    </div>
+
+    <button type="submit">Create</button>
+
+</form>

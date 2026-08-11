@@ -1,0 +1,24 @@
+﻿@model Customer
+
+<h1>Edit Customer</h1>
+
+<form asp-action="Edit" method="post">
+    <label asp-for="FullName"></label>
+    <input asp-for="FullName" value="@Model.FullName" />
+
+    <label asp-for="Email"></label>
+    <input asp-for="Email" value="@Model.Email"/>
+
+    <label asp-for="Address"></label>
+    <input asp-for="Address" value="@Model.Address"/>
+
+    <label asp-for="City"></label>
+    <input asp-for="City" value="@Model.City"/>
+    <input type="hidden" asp-for="PartitionKey" />
+    <input type="hidden" asp-for="RowKey" />
+
+    <button type="submit">Edit</button>
+</form>
+<a asp-action="Index">
+    Back to Customers
+</a>
