@@ -1,34 +1,64 @@
 ﻿@model List<ABCRetailAppCLoud.Models.FileUpload>
 
-<h2>Stored Files</h2>
+@{
+    ViewData["Title"] = "Stored Files";
+}
 
-<a asp-action="Create" class="btn btn-primary">
-    Upload File
-</a>
+<div class="container-fluid py-4 px-md-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-1 mb-2 px-2 py-1" style="font-size: 0.65rem; letter-spacing: 0.1em;">STORAGE</span>
+            <h2 class="fw-bold mb-0 text-white fs-4">Stored Files</h2>
+        </div>
+        <a asp-action="Create" class="btn btn-bracket border border-secondary rounded-1 px-3 py-2 text-white">
+            + UPLOAD FILE
+        </a>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>File Name</th>
-            <th>File Size</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var file in Model)
-        {
-            <tr>
-                <td>@file.FileName</td>
-                <td>@file.FileSize bytes</td>
-                <td>
-                    <a asp-action="Download" 
-                       asp-route-fileName="@file.FileName"
-                       class="btn btn-dark">
-                        Download
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <!-- Dark Table Card -->
+    <div class="dark-container overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">TYPE</th>
+                        <th>FILE NAME</th>
+                        <th>FILE SIZE</th>
+                        <th class="text-end">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                NO FILES STORED
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var file in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <i class="bi bi-file-earmark-code text-success fs-5"></i>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-white font-monospace">@file.FileName</span>
+                                </td>
+                                <td>
+                                    <span class="badge-tag font-monospace">@file.FileSize bytes</span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Download" asp-route-fileName="@file.FileName" class="btn-bracket">[DOWNLOAD]</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,33 +1,41 @@
 ﻿@model Product
 
-<h2>Product Details</h2>
+@{
+    ViewData["Title"] = "Product Details";
+}
 
-<div>
-    <h4>@Model.ProductName</h4>
+<div class="container py-5" style="max-width: 520px;">
+    <div class="dark-container p-4">
+        <!-- Image display -->
+        <div class="text-center bg-dark border border-dark rounded mb-4 p-3 position-relative overflow-hidden">
+            @if (!string.IsNullOrEmpty(Model.ProductImage))
+            {
+                <img src="@Model.ProductImage" alt="@Model.ProductName" class="img-fluid rounded" style="max-height: 240px; object-fit: contain;" />
+            }
+            else
+            {
+                <div class="py-5 text-secondary">
+                    <i class="bi bi-image display-4 d-block mb-2"></i>
+                    <span>NO IMAGE AVAILABLE</span>
+                </div>
+            }
+        </div>
 
-    <p>
-        <strong>Description:</strong>
-        @Model.Description
-    </p>
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-dark">
+            <h4 class="fw-bold mb-0 text-white">@Model.ProductName</h4>
+            <span class="fs-5 fw-bold text-success font-monospace">R @Model.Price</span>
+        </div>
 
-    <p>
-        <strong>Price:</strong>
-        @Model.Price
-    </p>
+        <div class="mb-4">
+            <span class="text-secondary small fw-bold d-block mb-1">DESCRIPTION</span>
+            <p class="text-white-50 mb-0" style="font-size: 0.9rem; line-height: 1.5;">
+                @(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)
+            </p>
+        </div>
 
-    <p>
-        <img src="@Model.ProductImage" alt="@Model.ProductName"
-             style="max-width: 400px;" />
-        
-    </p>
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dark">
+            <a asp-action="Index" class="btn-bracket text-secondary">[ BACK ]</a>
+            <a asp-action="Edit" asp-route-partitionKey="@Model.PartitionKey" asp-route-rowKey="@Model.RowKey" class="btn btn-bracket border border-secondary text-white px-3">[ EDIT ]</a>
+        </div>
+    </div>
 </div>
-
-<a asp-action="Edit"
-   asp-route-partitionKey="@Model.PartitionKey"
-   asp-route-rowKey="@Model.RowKey">
-    Edit
-</a>
-
-<a asp-action="Index">
-    Back to Products
-</a>

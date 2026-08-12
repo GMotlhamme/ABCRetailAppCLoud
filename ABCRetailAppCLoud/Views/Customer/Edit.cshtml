@@ -1,24 +1,45 @@
 ﻿@model Customer
 
-<h1>Edit Customer</h1>
+@{
+    ViewData["Title"] = "Edit Customer";
+}
 
-<form asp-action="Edit" method="post">
-    <label asp-for="FullName"></label>
-    <input asp-for="FullName" value="@Model.FullName" />
+<div class="container py-5" style="max-width: 520px;">
+    <div class="dark-container p-4">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom border-dark">
+            <h5 class="fw-bold mb-0 text-white">EDIT PROFILE</h5>
+            <span class="badge-tag">ID: @Model.RowKey</span>
+        </div>
 
-    <label asp-for="Email"></label>
-    <input asp-for="Email" value="@Model.Email"/>
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="PartitionKey" />
+            <input type="hidden" asp-for="RowKey" />
 
-    <label asp-for="Address"></label>
-    <input asp-for="Address" value="@Model.Address"/>
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label text-secondary small fw-bold">FULL NAME</label>
+                <input asp-for="FullName" class="form-control dark-input" value="@Model.FullName" required />
+            </div>
 
-    <label asp-for="City"></label>
-    <input asp-for="City" value="@Model.City"/>
-    <input type="hidden" asp-for="PartitionKey" />
-    <input type="hidden" asp-for="RowKey" />
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label text-secondary small fw-bold">EMAIL ADDRESS</label>
+                <input asp-for="Email" type="email" class="form-control dark-input" value="@Model.Email" required />
+            </div>
 
-    <button type="submit">Edit</button>
-</form>
-<a asp-action="Index">
-    Back to Customers
-</a>
+            <div class="row g-2 mb-4">
+                <div class="col-8">
+                    <label asp-for="Address" class="form-label text-secondary small fw-bold">ADDRESS</label>
+                    <input asp-for="Address" class="form-control dark-input" value="@Model.Address" required />
+                </div>
+                <div class="col-4">
+                    <label asp-for="City" class="form-label text-secondary small fw-bold">CITY</label>
+                    <input asp-for="City" class="form-control dark-input" value="@Model.City" required />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dark">
+                <a asp-action="Index" class="btn-bracket text-secondary">[ CANCEL ]</a>
+                <button type="submit" class="btn btn-bracket border border-success text-success px-4">[ UPDATE ]</button>
+            </div>
+        </form>
+    </div>
+</div>

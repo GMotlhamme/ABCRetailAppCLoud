@@ -1,10 +1,26 @@
 ﻿@model ABCRetailAppCLoud.Models.FileUpload
 
-<h1>New Uploads</h1>
+@{
+    ViewData["Title"] = "New Upload";
+}
 
-<form action="/file/create" enctype="multipart/form-data" method="post">
-    <label for="fileUpload">Choose a file:</label>
-    <input type="file" id="file" name="file" />
+<div class="container py-5" style="max-width: 500px;">
+    <div class="dark-container p-4">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom border-dark">
+            <h5 class="fw-bold mb-0 text-white">NEW UPLOAD</h5>
+            <span class="badge-tag">AZURE STORAGE</span>
+        </div>
 
-    <button class="btn btn-dark" type="submit">Upload File</button>
-</form>
+        <form action="/file/create" enctype="multipart/form-data" method="post">
+            <div class="mb-4">
+                <label for="file" class="form-label text-secondary small fw-bold">CHOOSE A FILE</label>
+                <input type="file" id="file" name="file" class="form-control dark-input" required />
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dark">
+                <a asp-action="Index" class="btn-bracket text-secondary">[ CANCEL ]</a>
+                <button type="submit" class="btn btn-bracket border border-success text-success px-4">[ UPLOAD FILE ]</button>
+            </div>
+        </form>
+    </div>
+</div>

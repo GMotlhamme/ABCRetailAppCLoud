@@ -10,7 +10,7 @@ namespace ABCRetailAppCLoud.Models
         public string? RowKey { get; set; }
         [Required]
         public string ProductName { get; set; }
-        public decimal Price { get; set; }
+        public double Price { get; set; }
         [Required]
         public string Description { get; set; }
         public string? ProductImage { get; set; }

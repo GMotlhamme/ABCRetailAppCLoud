@@ -1,32 +1,39 @@
 ﻿@model Customer
 
-<h2>Customer Details</h2>
+@{
+    ViewData["Title"] = "Customer Details";
+}
 
-<div>
-    <h4>@Model.FullName</h4>
+<div class="container py-5" style="max-width: 480px;">
+    <div class="dark-container p-4">
+        <div class="d-flex align-items-center gap-3 pb-3 mb-4 border-bottom border-dark">
+            <div class="rounded-circle bg-dark border border-secondary d-flex align-items-center justify-content-center text-white fw-bold fs-5" style="width: 44px; height: 44px;">
+                @(string.IsNullOrEmpty(Model.FullName) ? "C" : Model.FullName.Substring(0, 1).ToUpper())
+            </div>
+            <div>
+                <h5 class="fw-bold mb-0 text-white">@Model.FullName</h5>
+                <span class="text-success small fw-monospace">● VERIFIED RECORD</span>
+            </div>
+        </div>
 
-    <p>
-        <strong>Email:</strong>
-        @Model.Email
-    </p>
+        <div class="vstack gap-3 font-monospace small">
+            <div class="d-flex justify-content-between py-2 border-bottom border-dark">
+                <span class="text-secondary">EMAIL</span>
+                <span class="text-white">@Model.Email</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom border-dark">
+                <span class="text-secondary">ADDRESS</span>
+                <span class="text-white">@Model.Address</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom border-dark">
+                <span class="text-secondary">CITY</span>
+                <span class="text-white">@Model.City</span>
+            </div>
+        </div>
 
-    <p>
-        <strong>Address:</strong>
-        @Model.Address
-    </p>
-
-    <p>
-        <strong>City:</strong>
-        @Model.City
-    </p>
+        <div class="d-flex justify-content-between align-items-center pt-4 mt-2">
+            <a asp-action="Index" class="btn-bracket text-secondary">[ BACK ]</a>
+            <a asp-action="Edit" asp-route-partitionKey="@Model.PartitionKey" asp-route-rowKey="@Model.RowKey" class="btn btn-bracket border border-secondary text-white px-3">[ EDIT ]</a>
+        </div>
+    </div>
 </div>
-
-<a asp-action="Edit"
-   asp-route-partitionKey="@Model.PartitionKey"
-   asp-route-rowKey="@Model.RowKey">
-    Edit
-</a>
-
-<a asp-action="Index">
-    Back to Customers
-</a>
