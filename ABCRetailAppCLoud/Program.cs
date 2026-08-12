@@ -10,7 +10,7 @@ builder.Services.AddScoped<AzureTableService>();
 builder.Services.Configure<AzureBlobStorageConfigs>(builder.Configuration.GetSection("AzureStorage"));
 builder.Services.AddScoped<AzureBlobService>();
 builder.Services.AddScoped<AzureQueueService>();
-//builder.Services.AddScoped<AzurefileService>();
+builder.Services.AddScoped<AzureFileService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,7 +30,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Order}/{action=Create}/{id?}")
+    pattern: "{controller=file}/{action=index}/{id?}")
     .WithStaticAssets();
 
 

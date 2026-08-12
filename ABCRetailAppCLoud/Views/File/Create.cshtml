@@ -1,0 +1,10 @@
+﻿@model ABCRetailAppCLoud.Models.FileUpload
+
+<h1>New Uploads</h1>
+
+<form action="/file/create" enctype="multipart/form-data" method="post">
+    <label for="fileUpload">Choose a file:</label>
+    <input type="file" id="file" name="file" />
+
+    <button class="btn btn-dark" type="submit">Upload File</button>
+</form>
