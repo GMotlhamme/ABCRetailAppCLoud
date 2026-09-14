@@ -2,40 +2,37 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 
 namespace ABCRetailAppCLoud.Services
 {
     public class AzureBlobService
     {
-        //UserDelegationKey to get the connection string and container name from appsettings
-        private readonly AzureBlobStorageConfigs _setting;
+        
+        private readonly IHttpClientFactory http;
 
-        public AzureBlobService(IOptions<AzureBlobStorageConfigs> setting)
+        public AzureBlobService(IHttpClientFactory http)
         {
-            _setting = setting.Value;
+            this.http = http;
         }
         public async Task<string> UploadImageAsync(IFormFile file)
         {
-            if (file == null || file.Length == 0) throw new ArgumentException("File is invalid");
+            var client = http.CreateClient("AzureFunctions");
+            using var content = new MultipartFormDataContent();
 
-            var blobServiceClient = new BlobServiceClient(_setting.ConnectionString);
-            var containerClient = blobServiceClient.GetBlobContainerClient(_setting.ContainerName);
-            await containerClient.CreateIfNotExistsAsync();
+            using var stream = file.OpenReadStream();
 
-            //Generate a unique filename
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            var blobClient = containerClient.GetBlobClient(fileName);
+            var fileContent = new StreamContent(stream);
 
-            //Upload file with content type
-            using (var stream = file.OpenReadStream())
-            {
-                await blobClient.UploadAsync(stream, new BlobUploadOptions
-                {
-                    HttpHeaders = new BlobHttpHeaders { ContentType = file.ContentType }
-                });
-            }
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
 
-            return blobClient.Uri.ToString();
+            content.Add(fileContent, "file", file.FileName);
+
+            var response = await client.PostAsync("api/UploadImage", content);
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }

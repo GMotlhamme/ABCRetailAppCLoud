@@ -30,7 +30,7 @@ namespace ABCRetailAppCLoud.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Product product, IFormFile file)
+        public async Task<IActionResult> Create(Product product, IFormFile? file)
         {
             if (!ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace ABCRetailAppCLoud.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Product product, IFormFile file)
+        public async Task<IActionResult> Edit(Product product, IFormFile? file)
         {
             if (!ModelState.IsValid)
             {
@@ -101,7 +101,7 @@ namespace ABCRetailAppCLoud.Controllers
                     var image = await azureBlobService.UploadImageAsync(file);
                     product.ProductImage = image;
                 }
-                await azureTableService.AddOrUpdateProductAsync(product);
+                await azureTableService.EditProductAsync(product);
                 return RedirectToAction("Index");
             }
             catch (Exception)

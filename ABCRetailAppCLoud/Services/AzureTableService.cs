@@ -1,5 +1,6 @@
 ﻿using ABCRetailAppCLoud.Models;
 using Azure.Data.Tables;
+using static System.Net.WebRequestMethods;
 
 namespace ABCRetailAppCLoud.Services
 {
@@ -7,78 +8,136 @@ namespace ABCRetailAppCLoud.Services
     {
         private readonly TableClient customerTableClient;
         private readonly TableClient productTableClient;
+        private readonly IHttpClientFactory http;
 
-        public AzureTableService(IConfiguration configuration)
+        public AzureTableService(IHttpClientFactory http)
         {
-            var connectionString = configuration.GetRequiredSection("AzureStorage:ConnectionString").Value; ;
+            //var connectionString = configuration.GetRequiredSection("AzureStorage:ConnectionString").Value; ;
 
-            var customerTableName = configuration.GetRequiredSection("AzureStorage:CustomerTableName").Value;
+            //var customerTableName = configuration.GetRequiredSection("AzureStorage:CustomerTableName").Value;
 
-            var productTableName = configuration.GetRequiredSection("AzureStorage:ProductTableName").Value;
+            //var productTableName = configuration.GetRequiredSection("AzureStorage:ProductTableName").Value;
 
-            //create a client for azure storage
-            var serviceClient = new TableServiceClient(connectionString);
+            ////create a client for azure storage
+            //var serviceClient = new TableServiceClient(connectionString);
 
-            //connect the specified table
-            customerTableClient = serviceClient.GetTableClient(customerTableName);
-            //checking if our table exists, if it doesnt create the table
-            customerTableClient.CreateIfNotExists();
+            ////connect the specified table
+            //customerTableClient = serviceClient.GetTableClient(customerTableName);
+            ////checking if our table exists, if it doesnt create the table
+            //customerTableClient.CreateIfNotExists();
 
-            productTableClient = serviceClient.GetTableClient(productTableName);
-            productTableClient.CreateIfNotExists();
+            //productTableClient = serviceClient.GetTableClient(productTableName);
+            //productTableClient.CreateIfNotExists();
+            this.http = http;
         }
 
         public async Task AddOrUpdateCustomerAsync(Customer customer)
         {
-            await customerTableClient.UpsertEntityAsync(customer);
-        }
-
-        public async Task<Customer> GetCustomerAsync(string partitionKey, string rowKey) 
-        {
-            var specificCustomer = await customerTableClient.GetEntityAsync<Customer>(partitionKey, rowKey);
-            return specificCustomer.Value;
-        }
-
-        public async Task<List<Customer>> GetCustomersAsync()
-        {
-            List<Customer> listOfCustomers = [];
-            await foreach(Customer customer in customerTableClient.QueryAsync<Customer>())
+            //await customerTableClient.UpsertEntityAsync(customer);
+            var client = http.CreateClient("AzureFunctions");
+            using HttpResponseMessage httpResponse = await client.PostAsJsonAsync("api/Customer", new Customer
             {
-                listOfCustomers.Add(customer);
-            }
-            return listOfCustomers;
+                FullName = customer.FullName,
+                Email = customer.Email,
+                Address = customer.Address,
+                City = customer.City
+            });
+
+            httpResponse.EnsureSuccessStatusCode();
+
+        }
+
+        public async Task EditCustomerAsync(Customer customer)
+        {
+            var client = http.CreateClient("AzureFunctions");
+
+            var response = await client.PutAsJsonAsync( $"api/customers/{customer.PartitionKey}/{customer.RowKey}", new Customer
+                {
+                    FullName = customer.FullName,
+                    Email = customer.Email,
+                    Address = customer.Address,
+                    City = customer.City
+                });
+
+            response.EnsureSuccessStatusCode();
+        }
+
+
+        public async Task<Customer> GetCustomerAsync(string partitionKey, string rowKey)
+        {
+            var client = http.CreateClient("AzureFunctions");
+            var specificCustomer = await client.GetFromJsonAsync<Customer>($"api/customers/{partitionKey}/{rowKey}");
+            return specificCustomer;
+        }
+
+        public async Task<List<Customer>?> GetCustomersAsync()
+        {
+            var client = http.CreateClient("AzureFunctions");
+
+            var clients = await client.GetFromJsonAsync<List<Customer>>("api/customers");
+
+            return clients;
         }
 
         public async Task DeleteCustomerAsync(string partitionKey, string rowKey)
         {
-            await customerTableClient.DeleteEntityAsync(partitionKey, rowKey);
+            
+            var client = http.CreateClient("AzureFunctions");
+
+            var response = await client.DeleteAsync($"api/customers/{partitionKey}/{rowKey}");
+
+            response.EnsureSuccessStatusCode();
+        
         }
 
 
 
         public async Task AddOrUpdateProductAsync(Product product)
         {
-            await productTableClient.UpsertEntityAsync(product);
+            var client = http.CreateClient("AzureFunctions");
+            using HttpResponseMessage httpResponse = await client.PostAsJsonAsync("api/products", new Product
+            {
+                ProductName = product.ProductName,
+                Description = product.Description,
+                Price = product.Price,
+                ProductImage = product.ProductImage
+            });
+
+            httpResponse.EnsureSuccessStatusCode();
+        }
+
+        public async Task EditProductAsync(Product product)
+        {
+            var client = http.CreateClient("AzureFunctions");
+
+            var response = await client.PutAsJsonAsync($"api/products/{product.PartitionKey}/{product.RowKey}", new Product
+            {
+                ProductName = product.ProductName,
+                Description = product.Description,
+                Price = product.Price,
+                ProductImage = product.ProductImage
+            });
+
+            response.EnsureSuccessStatusCode();
         }
         public async Task<Product> GetProductAsync(string partitionKey, string rowKey) 
         {
-            var specificProduct = await productTableClient.GetEntityAsync<Product>(partitionKey, rowKey);
-            return specificProduct.Value;
+            var client = http.CreateClient("AzureFunctions");
+            var httpResponse = await client.GetFromJsonAsync<Product>($"api/products/{partitionKey}/{rowKey}");
+            return httpResponse;
         }
 
-        public async Task<List<Product>> GetProductsAsync()
+        public async Task<List<Product>?> GetProductsAsync()
         {
-            List<Product> listOfProducts = [];
-            await foreach(Product product in productTableClient.QueryAsync<Product>())
-            {
-                listOfProducts.Add(product);
-            }
-            return listOfProducts;
+            var client = http.CreateClient("AzureFunctions");
+            var products = await client.GetFromJsonAsync<List<Product>>("api/products");
+            return products;
         }
 
         public async Task DeleteProductAsync(string partitionKey, string rowKey)
         {
-            await productTableClient.DeleteEntityAsync(partitionKey, rowKey);
+            var client = http.CreateClient("AzureFunctions");
+            await client.DeleteAsync($"api/deleteProduct/{partitionKey}/{rowKey}");
         }
     }
 }

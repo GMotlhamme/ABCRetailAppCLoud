@@ -88,7 +88,7 @@ namespace ABCRetailAppCLoud.Controllers
             }
             try
             {
-                await azureTableService.AddOrUpdateCustomerAsync(customer);
+                await azureTableService.EditCustomerAsync(customer);
                 return RedirectToAction("Index");
             }catch(Exception)
             {
