@@ -16,7 +16,7 @@ public class CustomerFunction
     private readonly TableClient customerTableClient;
     private readonly ILogger<CustomerFunction> _logger;
 
-    public CustomerFunction(ILogger<CustomerFunction> logger, IConfiguration configuration)
+    public CustomerFunction(ILogger<CustomerFunction> logger)
     {
         _logger = logger;
 

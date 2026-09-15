@@ -1,48 +1,38 @@
 ﻿using ABCRetailAppCLoud.Models;
 using Azure.Storage.Queues;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace ABCRetailAppCLoud.Services
 {
     public class AzureQueueService
     {
-        private readonly QueueClient queueClient;
+        private readonly IHttpClientFactory http;
 
-        public AzureQueueService(IConfiguration configuration)
+        public AzureQueueService(IHttpClientFactory http)
         {
-            var connectionString = configuration.GetSection("AzureStorage:ConnectionString").Value;
-
-            var queueName = configuration.GetSection("AzureStorage:QueueName").Value;
-
-            queueClient = new QueueClient(connectionString, queueName);
-
-            queueClient.CreateIfNotExists();
+            this.http = http;
         }
 
         public async Task SendMessageAsync(OrderMessage orderMessage)
         {
-            var message = JsonSerializer.Serialize(orderMessage);
-            await queueClient.SendMessageAsync(message);
+            var client = http.CreateClient("AzureFunctions");
+            await client.PostAsJsonAsync("api/AddQueue", new OrderMessage
+            {
+                OrderId = orderMessage.OrderId,
+                CustomerId = orderMessage.CustomerId,
+                ProductId = orderMessage.ProductId,
+                Action = orderMessage.Action,
+                Quantity = orderMessage.Quantity,
+                CreatedAt = orderMessage.CreatedAt
+            });
         }
 
-        public async Task<List<OrderMessage>> GetMessagesAsync()
+        public async Task<List<OrderMessage>?> GetMessagesAsync()
         {
-            List<OrderMessage> messages = [];
-
-            var response = await queueClient.PeekMessagesAsync(maxMessages: 32);
-
-            foreach (var message in response.Value)
-            {
-                var orderMessage =
-        JsonSerializer.Deserialize<OrderMessage>(message.MessageText);
-
-                if (orderMessage != null)
-                {
-                    messages.Add(orderMessage);
-                }
-            }
-
-            return messages;
+            var client = http.CreateClient("AzureFunctions");
+            var orders = await client.GetFromJsonAsync<List<OrderMessage>>("api/GetQueueMessage");
+            return orders;
         }
     }
 }

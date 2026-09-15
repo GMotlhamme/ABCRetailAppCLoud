@@ -2,86 +2,57 @@
 using Azure;
 using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
+using System.Net.Http.Headers;
 
 namespace ABCRetailAppCLoud.Services
 {
     public class AzureFileService
     {
+        private readonly IHttpClientFactory http;
         private readonly ShareClient _shareClient;
 
-        public AzureFileService(IConfiguration configuration)
+        public AzureFileService(IHttpClientFactory http )
         {
-
-            //go to app settings and fetch the connection string value
-            var connectionString = configuration["AzureStorage:ConnectionString"];
-
-            //connect to the Azure File share
-            _shareClient = new ShareClient(connectionString, "retailfiles");
-
-            //checking if our table exists, if it doesnt create the table
-            _shareClient.CreateIfNotExists();
-
+            this.http = http;
         }
 
         //create- upload a new file
         public async Task UploadFileAsync(IFormFile file)
         {
-            // Get the root directory of the File share
-            ShareDirectoryClient directory = _shareClient.GetRootDirectoryClient();
+            var client = http.CreateClient("AzureFunctions");
+            using var content = new MultipartFormDataContent();
 
-            //create a reference to the file
-            ShareFileClient fileClient = directory.GetFileClient(file.FileName);
+            using var stream = file.OpenReadStream();
 
-            //open the upload file
-            using Stream stream = file.OpenReadStream();
+            var fileContent = new StreamContent(stream);
 
-            //create the file in Azure
-            await fileClient.CreateAsync(stream.Length);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
 
-            //upload the contents of the file
-            await fileClient.UploadRangeAsync(new HttpRange(0, stream.Length), stream);
+            content.Add(fileContent, "file", file.FileName);
+
+            var response = await client.PostAsync("api/UploadFileAsync", content);
+
+            response.EnsureSuccessStatusCode();
         }
 
         //READ get all the files
         public async Task<List<FileUpload>> GetFilesAsync()
         {
-            List<FileUpload> files = [];
-
-            //get the root directory 
-
-            ShareDirectoryClient directory = _shareClient.GetRootDirectoryClient();
-
-            //retrieve all files in the directory
-            await foreach (ShareFileItem item in directory.GetFilesAndDirectoriesAsync())
-            {
-                //ignore directories
-                if (!item.IsDirectory)
-                {
-                    FileUpload studentFile = new FileUpload();
-
-                    studentFile.FileName = item.Name;
-
-                    if (item.FileSize.HasValue)
-                    {
-                        studentFile.FileSize = item.FileSize.Value;
-                    }
-                    files.Add(studentFile);
-                }
-            }
-            return files;
+            var client = http.CreateClient("AzureFunctions");
+            var httpResponse = await client.GetFromJsonAsync<List<FileUpload>>("api/GetFiles");
+            return httpResponse;
         }
 
         //download a file
         public async Task<Stream> DownloadFileAsync(string fileName)
         {
-            ShareDirectoryClient directory = _shareClient.GetRootDirectoryClient();
+            var client = http.CreateClient("AzureFunctions");
 
-            ShareFileClient fileClient = directory.GetFileClient(fileName);
+            var response = await client.GetAsync($"api/DownloadFile/{Uri.EscapeDataString(fileName)}");
 
-            //download the file from azure
-            ShareFileDownloadInfo download = await fileClient.DownloadAsync();
+            response.EnsureSuccessStatusCode();
 
-            return download.Content;
+            return await response.Content.ReadAsStreamAsync();
         }
     }
 }
