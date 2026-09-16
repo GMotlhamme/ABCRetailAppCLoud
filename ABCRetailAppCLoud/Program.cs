@@ -6,8 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHttpClient("AzureFunctions", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:7015/");
+});
+
 builder.Services.AddScoped<AzureTableService>();
-builder.Services.Configure<AzureBlobStorageConfigs>(builder.Configuration.GetSection("AzureStorage"));
 builder.Services.AddScoped<AzureBlobService>();
 builder.Services.AddScoped<AzureQueueService>();
 builder.Services.AddScoped<AzureFileService>();
